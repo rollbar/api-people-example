@@ -12,18 +12,7 @@ Stdout will have status information.
 
 Usage:
 
-python fetch_people_for_items.py <read access token> <output filename> <item id 1> [<item id 2, etc.>]
-
-
-To get the item ids
--------------------
-If just one item, go to the Occurrences tab, then click on one of the timestamps, then find the id in the url: rollbar.com/item/ITEM_ID_HERE/instance/INSTANCE_ID_HERE
-
-If lots of item ids (i.e. from a search), use the browser. Go to the Items page, run your search, and then you can get item ids for everything on the page by running this in the chrome console:
-
-  var ids = []; 
-  $('tr.item-details').each(function() { ids.push($(this).attr('data-reactid').match(/\{(\d+)\}/)[1]); }); 
-  console.log(ids.join(" "));
+python fetch_people_for_items.py <read access token> <output filename> <item counter 1> [<item counter 2, etc.>]
 """
 
 import sys
@@ -31,7 +20,19 @@ import json
 import requests  # version 2
 
 
-def fetch_people_for_item(access_token, output_file, item_id):
+def fetch_item_id_for_counter(access_token, item_counter):
+    resp = requests.get('https://api.rollbar.com/api/1/item_by_counter/%d?access_token=%s' % (
+        item_counter, access_token),
+        allow_redirects=False)
+
+    if resp.status_code != 301:
+        print resp
+        raise Exception("Got an API error while fetching an item by counter")
+
+    return resp.json()['result']['itemId']
+
+
+def fetch_people_for_item_id(access_token, output_file, item_id):
     page_number = 1
     while True:
         print "Fetching page", page_number
@@ -67,10 +68,10 @@ if __name__ == '__main__':
     
     access_token = sys.argv[1]
     output_filename = sys.argv[2]
-    item_ids = [int(x) for x in sys.argv[3:]]
+    item_counters = [int(x) for x in sys.argv[3:]]
 
     output_file = open(output_filename, 'w')
 
-    for item_id in item_ids:
-        fetch_people_for_item(access_token, output_file, item_id)
-
+    for item_counter in item_counters:
+        item_id = fetch_item_id_for_counter(access_token, item_counter)
+        fetch_people_for_item_id(access_token, output_file, item_id)
