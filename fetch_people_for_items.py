@@ -15,6 +15,8 @@ Usage:
 python fetch_people_for_items.py <read access token> <output filename> <item counter 1> [<item counter 2, etc.>]
 """
 
+from __future__ import print_function
+
 import sys
 import json
 import requests  # version 2
@@ -28,7 +30,7 @@ def fetch_item_id_for_counter(access_token, item_counter):
     )
 
     if resp.status_code != 301:
-        print resp
+        print(resp)
         raise Exception("Got an API error while fetching an item by counter")
 
     return resp.json()['result']['itemId']
@@ -37,7 +39,7 @@ def fetch_item_id_for_counter(access_token, item_counter):
 def fetch_people_for_item_id(access_token, output_file, item_id):
     page_number = 1
     while True:
-        print "Fetching page", page_number
+        print("Fetching page", page_number)
         page_data = fetch_page(access_token, item_id, page_number)
         if not page_data:
             # we have reached the end
@@ -59,7 +61,7 @@ def fetch_page(access_token, item_id, page=1):
     )
 
     if resp.status_code != 200:
-        print resp
+        print(resp)
         raise Exception("Got an error from the Rollbar API")
     
     return resp.json()['result']['instances']
@@ -67,7 +69,7 @@ def fetch_page(access_token, item_id, page=1):
     
 if __name__ == '__main__':
     if len(sys.argv) < 4:
-        print "Usage: python fetch_people_for_items.py <read access token> <output filename> <item id 1> [<item id 2> ...]"
+        print("Usage: python fetch_people_for_items.py <read access token> <output filename> <item id 1> [<item id 2> ...]")
         sys.exit(1)
     
     access_token = sys.argv[1]
