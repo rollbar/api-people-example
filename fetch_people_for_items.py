@@ -21,9 +21,11 @@ import requests  # version 2
 
 
 def fetch_item_id_for_counter(access_token, item_counter):
-    resp = requests.get('https://api.rollbar.com/api/1/item_by_counter/%d?access_token=%s' % (
-        item_counter, access_token),
-        allow_redirects=False)
+    resp = requests.get(
+        'https://api.rollbar.com/api/1/item_by_counter/%d' % item_counter,
+        headers={'X-Rollbar-Access-Token': access_token},
+        allow_redirects=False,
+    )
 
     if resp.status_code != 301:
         print resp
@@ -51,9 +53,11 @@ def fetch_people_for_item_id(access_token, output_file, item_id):
 
 
 def fetch_page(access_token, item_id, page=1):
-    resp = requests.get('https://api.rollbar.com/api/1/item/%d/instances/?access_token=%s&page=%d' %
-        (item_id, access_token, page))
-    
+    resp = requests.get(
+        'https://api.rollbar.com/api/1/item/%d/instances/?page=%d' % (item_id, page),
+        headers={'X-Rollbar-Access-Token': access_token},
+    )
+
     if resp.status_code != 200:
         print resp
         raise Exception("Got an error from the Rollbar API")
