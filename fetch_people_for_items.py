@@ -24,7 +24,7 @@ import requests  # version 2
 
 def fetch_item_id_for_counter(access_token, item_counter):
     resp = requests.get(
-        "https://api.rollbar.com/api/1/item_by_counter/%d" % item_counter,
+        "https://api.rollbar.com/api/1/item_by_counter/{}".format(item_counter),
         headers={"X-Rollbar-Access-Token": access_token},
         allow_redirects=False,
     )
@@ -56,7 +56,7 @@ def fetch_people_for_item_id(access_token, output_file, item_id):
 
 def fetch_page(access_token, item_id, page=1):
     resp = requests.get(
-        "https://api.rollbar.com/api/1/item/%d/instances/?page=%d" % (item_id, page),
+        "https://api.rollbar.com/api/1/item/{}/instances/?page={}".format(item_id, page),
         headers={"X-Rollbar-Access-Token": access_token},
     )
 
